@@ -58,7 +58,7 @@ const AdminDashboard = () => {
 
       console.log('🔍 [AdminDashboard] Loading all bookings from backend...');
       
-      const response = await fetch('http://localhost:5000/api/bookings/all', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/all`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -106,7 +106,7 @@ const AdminDashboard = () => {
       
       if (!token) return;
 
-      const response = await fetch('http://localhost:5000/api/admin/stats', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats`, {
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
@@ -147,7 +147,7 @@ const AdminDashboard = () => {
 
       console.log('🔍 [AdminDashboard] Loading all users from backend...');
       
-      const response = await fetch('http://localhost:5000/api/admin/users', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -273,7 +273,7 @@ const AdminDashboard = () => {
       
       console.log('🗑️ [AdminDashboard] Deleting user:', userId);
       
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}`, {
         method: 'DELETE',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -323,7 +323,7 @@ const AdminDashboard = () => {
       
       console.log('🔄 [AdminDashboard] Toggling user status:', userId, 'to:', newStatus);
       
-      const response = await fetch(`http://localhost:5000/api/admin/users/${userId}/status`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/status`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -425,7 +425,7 @@ const AdminDashboard = () => {
 
       console.log('🔄 [AdminDashboard] Updating booking status:', { id, newStatus });
       
-      const response = await fetch(`http://localhost:5000/api/bookings/status/${id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/status/${id}`, {
         method: 'PATCH',
         headers: {
           'Authorization': `Bearer ${token}`,
