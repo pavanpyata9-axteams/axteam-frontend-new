@@ -1,0 +1,404 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  line-height: 1.6;
+  color: #333;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #3b82f6;
+  border-radius: 5px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2563eb;
+}
+
+/* Animation utilities */
+.fade-in {
+  animation: fadeIn 0.5s ease-in;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Floating button animation */
+.float {
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+/* Hover effects */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 768px) {
+  /* Disable hover effects on mobile */
+  .hover-lift:hover {
+    transform: none;
+    box-shadow: inherit;
+  }
+  
+  /* Mobile touch feedback */
+  .hover-lift:active {
+    transform: scale(0.98);
+    transition: transform 0.1s ease;
+  }
+  
+  /* Improved touch targets */
+  button, a {
+    min-height: 44px;
+    min-width: 44px;
+  }
+  
+  /* Better text readability on mobile */
+  body {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  /* Smooth scrolling optimization for mobile */
+  * {
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Prevent zoom on input focus */
+  input, select, textarea {
+    font-size: 16px;
+  }
+}
+
+/* Animation for mobile modal slide-up */
+@keyframes slide-up {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+.animate-slide-up {
+  animation: slide-up 0.3s ease-out;
+}
+
+/* Fade in animation for category cards */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.6s ease-out forwards;
+  opacity: 0;
+}
+
+/* Slide in up animation for service items */
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-slideInUp {
+  animation: slideInUp 0.4s ease-out forwards;
+}
+
+/* Mobile-first responsive typography */
+@media (max-width: 640px) {
+  html {
+    font-size: 14px;
+  }
+}
+
+@media (min-width: 641px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+/* Optimize images for mobile */
+@media (max-width: 768px) {
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+}
+
+/* Better mobile navigation */
+@media (max-width: 768px) {
+  .mobile-nav-container {
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+}
+
+/* Our Services Section Animations - Seamless Infinite Loop */
+@keyframes scroll-right-seamless {
+  0% { 
+    transform: translateX(0%);
+  }
+  100% { 
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-left-seamless {
+  0% { 
+    transform: translateX(-50%);
+  }
+  100% { 
+    transform: translateX(0%);
+  }
+}
+
+.animate-scroll-right {
+  animation: scroll-right-seamless 40s linear infinite;
+}
+
+.animate-scroll-right-delayed {
+  animation: scroll-right-seamless 45s linear infinite;
+}
+
+.animate-scroll-left {
+  animation: scroll-left-seamless 40s linear infinite;
+}
+
+.animate-scroll-left-delayed {
+  animation: scroll-left-seamless 45s linear infinite;
+}
+
+/* Mobile Our Services Animations - Seamless Infinite Loop */
+@keyframes scroll-right-seamless-mobile {
+  0% { 
+    transform: translateX(0%);
+  }
+  100% { 
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-left-seamless-mobile {
+  0% { 
+    transform: translateX(-50%);
+  }
+  100% { 
+    transform: translateX(0%);
+  }
+}
+
+.animate-scroll-right-mobile {
+  animation: scroll-right-seamless-mobile 35s linear infinite;
+}
+
+.animate-scroll-right-delayed-mobile {
+  animation: scroll-right-seamless-mobile 40s linear infinite;
+}
+
+.animate-scroll-left-mobile {
+  animation: scroll-left-seamless-mobile 35s linear infinite;
+}
+
+.animate-scroll-left-delayed-mobile {
+  animation: scroll-left-seamless-mobile 40s linear infinite;
+}
+
+/* Review Carousel Infinite Scroll Animations */
+@keyframes scroll-reviews-desktop {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@keyframes scroll-reviews-mobile {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Review Carousel Container Styles */
+.carousel-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.carousel-track {
+  display: flex;
+  animation: scroll-reviews-desktop 60s linear infinite;
+  will-change: transform;
+}
+
+.carousel-item {
+  flex: 0 0 350px;
+  margin-right: 24px;
+  height: 280px;
+}
+
+/* Mobile responsive carousel */
+@media (max-width: 768px) {
+  .carousel-track {
+    animation: scroll-reviews-mobile 45s linear infinite;
+  }
+  
+  .carousel-item {
+    flex: 0 0 280px;
+    margin-right: 16px;
+    height: 300px;
+  }
+}
+
+/* Very small screens */
+@media (max-width: 480px) {
+  .carousel-track {
+    animation: scroll-reviews-mobile 40s linear infinite;
+  }
+  
+  .carousel-item {
+    flex: 0 0 260px;
+    margin-right: 12px;
+    height: 320px;
+  }
+}
+
+/* Line clamp utility for review text */
+.line-clamp-4 {
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.line-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* Pause animation on hover for better UX */
+.carousel-track:hover {
+  animation-play-state: paused;
+}
+
+/* Review Carousel Styles for Home.jsx */
+.review-carousel-container {
+  overflow: hidden;
+  width: 100%;
+  position: relative;
+}
+
+.review-carousel-track {
+  display: flex;
+  animation: scroll-reviews-infinite 60s linear infinite;
+  will-change: transform;
+}
+
+.review-card {
+  flex: 0 0 350px;
+  margin-right: 24px;
+  height: 280px;
+}
+
+/* Animation for infinite scroll */
+@keyframes scroll-reviews-infinite {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+/* Mobile responsive */
+@media (max-width: 768px) {
+  .review-carousel-track {
+    animation: scroll-reviews-infinite 45s linear infinite;
+  }
+  
+  .review-card {
+    flex: 0 0 280px;
+    margin-right: 16px;
+    height: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .review-carousel-track {
+    animation: scroll-reviews-infinite 40s linear infinite;
+  }
+  
+  .review-card {
+    flex: 0 0 260px;
+    margin-right: 12px;
+    height: 320px;
+  }
+}
+
+/* Pause on hover */
+.review-carousel-track:hover {
+  animation-play-state: paused;
+}
+
