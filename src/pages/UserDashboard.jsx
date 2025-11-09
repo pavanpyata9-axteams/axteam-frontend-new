@@ -82,7 +82,7 @@ const UserDashboard = () => {
       console.log('🔍 [UserDashboard] Fetching bookings for userId:', user._id);
       
       // ✅ FORCE FRESH API CALL: Direct fetch to ensure no caching
-      const response = await fetch(`http://localhost:5000/api/bookings/user/${user._id}`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/user/${user._id}`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
