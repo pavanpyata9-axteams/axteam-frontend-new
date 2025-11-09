@@ -21,7 +21,13 @@ api.interceptors.request.use(
         console.log('🔗 [axios] Request to:', config.url, 'with token');
       }
     } else {
-      console.warn('⚠️ [axios] No axteamAuth found for request to:', config.url);
+      // Check if this is a public route (like /api/reviews/homepage)
+      const isPublicRoute = config.url.includes('/api/reviews/homepage') || 
+                           config.url.includes('/api/services/') || 
+                           config.url.includes('/health');
+      if (!isPublicRoute) {
+        console.warn('⚠️ [axios] No axteamAuth found for request to:', config.url);
+      }
     }
     return config;
   },
