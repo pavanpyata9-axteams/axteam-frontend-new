@@ -38,12 +38,16 @@ const Navbar = () => {
         <div className="flex justify-between items-center h-20">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link to="/" className="flex items-center">
+            <Link to="/" className="flex items-center space-x-3">
               <img 
-                src="/axteam-logo.jpg" 
+                src="/assets/icons/axteam-logo.jpg" 
                 alt="AX Team Services" 
-                className="h-16 w-auto object-contain"
+                className="h-20 w-auto object-contain"
               />
+              <div className="flex flex-col">
+                <span className="text-2xl font-bold text-gray-900">AX</span>
+                <span className="text-2xl font-bold text-red-600">TEAM</span>
+              </div>
             </Link>
           </div>
 
