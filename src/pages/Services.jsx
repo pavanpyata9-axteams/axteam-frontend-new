@@ -6,11 +6,11 @@ import { sessionManager } from '../utils/sessionManager';
 // Logo paths for appliance services (referencing public directory)
 const acRepairLogo = '/assets/gallery/AC-Repair-and-Service.png';
 const acInstallationLogo = '/assets/gallery/AC-Installation-and-Uninstallation.png';
-const acAdvancedPipingLogo = '/assets/gallery/AC-Advanced-piping.png';
+const acAdvancedPipingLogo = '/assets/gallery/AC-Advanced-piping-.png';
 const acGasFillingLogo = '/assets/gallery/AC-GAS-FILLING.png';
 const geyserRepairLogo = '/assets/gallery/Geyser-Repair-and-Service.png';
 const geyserInstallationLogo = '/assets/gallery/Geyser-Installation-and-Uninstallation.png';
-const waterPurifierRepairLogo = '/assets/gallery/Water-Purifier-Repair-and-Service.png';
+const waterPurifierRepairLogo = '/assets/gallery/Water-Purifier--Repair-and-Service.png';
 const waterPurifierInstallationLogo = '/assets/gallery/Water-Purifier-Installation-and-Uninstallation.png';
 const microvenRepairLogo = '/assets/gallery/Microven-Repair-and-Service.png';
 const washingMachineInstallationLogo = '/assets/gallery/Washing-Machine-Installation-and-Uninstallation.png';
