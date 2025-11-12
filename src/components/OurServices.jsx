@@ -33,7 +33,7 @@ const OurServices = () => {
       'AC - Repair & Service': '/assets/gallery/AC-Repair-and-Service.png',
       'AC - Gas Fill Service': '/assets/gallery/AC-GAS-FILLING.png',
       'AC - Installation & Uninstallation': '/assets/gallery/AC-Installation-and-Uninstallation.png',
-      'AC - Advanced piping Repair & Service': '/assets/gallery/AC-Advanced-piping.png',
+      'AC - Advanced piping Repair & Service': '/assets/gallery/AC-Advanced-piping-.png',
       
       // Washing Machine Services
       'Top Load Fully Automatic - Repair & Service': '/assets/gallery/Top-Load-Fully-Automatic-Repair-and-Service.png',
@@ -51,7 +51,7 @@ const OurServices = () => {
       'Geyser - Installation & Uninstallation': '/assets/gallery/Geyser-Installation-and-Uninstallation.png',
       
       // Water Purifier Services
-      'Water Purifier - Repair & Service': '/assets/gallery/Water-Purifier-Repair-and-Service.png',
+      'Water Purifier - Repair & Service': '/assets/gallery/Water-Purifier--Repair-and-Service.png',
       'Water Purifier - Installation & Uninstallation': '/assets/gallery/Water-Purifier-Installation-and-Uninstallation.png',
       
       // Microwave Services
