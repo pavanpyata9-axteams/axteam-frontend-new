@@ -42,9 +42,9 @@ const Navbar = () => {
               <img 
                 src="/assets/icons/axteam-logo.jpg" 
                 alt="AX Team Services" 
-                className="h-20 w-auto object-contain"
+                className="max-h-16 md:max-h-20 w-auto object-contain"
               />
-              <div className="flex flex-col">
+              <div className="flex items-center space-x-1">
                 <span className="text-2xl font-bold text-gray-900">AX</span>
                 <span className="text-2xl font-bold text-red-600">TEAM</span>
               </div>
