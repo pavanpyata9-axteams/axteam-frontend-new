@@ -58,7 +58,7 @@ const AdminDashboard = () => {
 
       console.log('🔍 [AdminDashboard] Loading all bookings from backend...');
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/all`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/bookings/enhanced`, {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -77,15 +77,23 @@ const AdminDashboard = () => {
           email: booking.email,
           phone: booking.phone,
           services: booking.services,
-          servicesText: booking.services.map(s => s.serviceName).join(', '),
+          servicesText: booking.servicesText || booking.services.map(s => s.serviceName).join(', '),
           address: booking.address,
-          fullAddress: `${booking.address.street}, ${booking.address.city}, ${booking.address.state} - ${booking.address.pincode}`,
+          fullAddress: booking.fullAddress || `${booking.address.street}, ${booking.address.city}, ${booking.address.state} - ${booking.address.pincode}`,
           status: booking.status,
           date: booking.date,
           time: booking.time,
           workDescription: booking.workDescription,
           createdAt: booking.createdAt,
-          _id: booking._id
+          _id: booking._id,
+          // Enhanced fields
+          hasLocation: booking.hasLocation,
+          locationLink: booking.locationData?.coordinates?.latitude && booking.locationData?.coordinates?.longitude ? 
+            `https://maps.app.goo.gl/?link=https://www.google.com/maps?q=${booking.locationData.coordinates.latitude},${booking.locationData.coordinates.longitude}` : 
+            null,
+          hasTechnician: booking.hasTechnician,
+          technicianInfo: booking.technicianInfo,
+          technician: booking.technician
         }));
         
         console.log('✅ [AdminDashboard] Loaded bookings:', formattedBookings.length);
@@ -512,7 +520,7 @@ const AdminDashboard = () => {
 
       console.log('🔧 Assigning technician via API...', { bookingId: booking._id, technicianName, technicianPhone });
 
-      const response = await fetch(`/api/admin/bookings/${booking._id}/assign-technician`, {
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/bookings/${booking._id}/assign-technician`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -527,7 +535,7 @@ const AdminDashboard = () => {
 
       const data = await response.json();
 
-      if (response.ok) {
+      if (response.ok && data.success) {
         // Reload bookings to get updated data
         await loadAllBookings();
         setSelectedBooking(null);
@@ -543,6 +551,72 @@ const AdminDashboard = () => {
       console.error('❌ Technician assignment error:', error);
       alert('Failed to assign technician. Please check your connection and try again.');
     }
+  };
+
+  // Copy location link to clipboard
+  const copyLocationLink = async (locationLink) => {
+    if (!locationLink) {
+      alert('No location link available');
+      return;
+    }
+
+    try {
+      await navigator.clipboard.writeText(locationLink);
+      alert('Location link copied to clipboard!');
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      // Fallback for older browsers
+      const textArea = document.createElement('textarea');
+      textArea.value = locationLink;
+      document.body.appendChild(textArea);
+      textArea.select();
+      document.execCommand('copy');
+      document.body.removeChild(textArea);
+      alert('Location link copied to clipboard!');
+    }
+  };
+
+  // Share location on WhatsApp
+  const shareLocationOnWhatsApp = (booking) => {
+    if (!booking.technician?.phone) {
+      alert('No technician assigned yet');
+      return;
+    }
+
+    if (!booking.locationLink) {
+      alert('No location link available');
+      return;
+    }
+
+    const message = encodeURIComponent(`Customer Location:\n${booking.locationLink}\n\nPlease navigate to this location.`);
+    const technicianPhone = booking.technician.phone.replace(/\D/g, '');
+    const whatsappUrl = `https://wa.me/${technicianPhone}?text=${message}`;
+    
+    window.open(whatsappUrl, '_blank');
+  };
+
+  // Send complete info to technician
+  const sendToTechnician = (booking) => {
+    if (!booking.technician?.phone) {
+      alert('No technician assigned yet');
+      return;
+    }
+
+    const message = encodeURIComponent(
+      `New Booking Assigned:\n\n` +
+      `Customer: ${booking.name}\n` +
+      `Phone: ${booking.phone}\n` +
+      `Service: ${booking.servicesText}\n` +
+      `Address: ${booking.fullAddress}\n` +
+      `${booking.locationLink ? `Google Maps: ${booking.locationLink}\n` : ''}` +
+      `Booking ID: ${booking.bookingId}\n\n` +
+      `Please contact customer and visit location.`
+    );
+    
+    const technicianPhone = booking.technician.phone.replace(/\D/g, '');
+    const whatsappUrl = `https://wa.me/${technicianPhone}?text=${message}`;
+    
+    window.open(whatsappUrl, '_blank');
   };
 
   const handleSupportStatusChange = (id, newStatus) => {
@@ -918,6 +992,52 @@ const AdminDashboard = () => {
                             <div className="text-xs text-gray-400 mt-1">
                               Booking ID: {booking.bookingId}
                             </div>
+                            {booking.locationLink && (
+                              <div className="mt-2">
+                                <div className="text-xs text-blue-600 mb-1">Location:</div>
+                                <a 
+                                  href={booking.locationLink} 
+                                  target="_blank" 
+                                  rel="noopener noreferrer"
+                                  className="text-xs text-blue-600 hover:text-blue-800 underline block truncate max-w-xs"
+                                >
+                                  🔗 {booking.locationLink}
+                                </a>
+                                <div className="flex gap-1 mt-1">
+                                  <button
+                                    onClick={() => copyLocationLink(booking.locationLink)}
+                                    className="text-xs px-2 py-1 bg-gray-100 text-gray-700 rounded hover:bg-gray-200"
+                                    title="Copy Link"
+                                  >
+                                    📋
+                                  </button>
+                                  <button
+                                    onClick={() => shareLocationOnWhatsApp(booking)}
+                                    className={`text-xs px-2 py-1 rounded ${
+                                      booking.technician?.phone 
+                                        ? 'bg-green-100 text-green-700 hover:bg-green-200' 
+                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    }`}
+                                    disabled={!booking.technician?.phone}
+                                    title="Share on WhatsApp"
+                                  >
+                                    💬
+                                  </button>
+                                  <button
+                                    onClick={() => sendToTechnician(booking)}
+                                    className={`text-xs px-2 py-1 rounded ${
+                                      booking.technician?.phone 
+                                        ? 'bg-blue-100 text-blue-700 hover:bg-blue-200' 
+                                        : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    }`}
+                                    disabled={!booking.technician?.phone}
+                                    title="Send to Technician"
+                                  >
+                                    📤
+                                  </button>
+                                </div>
+                              </div>
+                            )}
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="space-y-1">
