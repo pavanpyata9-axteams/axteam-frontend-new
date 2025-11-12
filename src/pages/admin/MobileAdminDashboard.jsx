@@ -197,21 +197,81 @@ const MobileAdminDashboard = () => {
     }
   };
 
-  const handleAssignTechnician = (id) => {
+  const handleAssignTechnician = async (id) => {
     const booking = bookings.find(b => (b._id || b.id) === id);
-    const technicianName = prompt(`Enter technician name:`, booking.technicianName || '');
-    if (technicianName === null) return;
-    
-    const technicianPhone = prompt(`Enter technician phone:`, booking.technicianPhone || '');
-    if (technicianPhone === null) return;
+    if (!booking) {
+      alert('Booking not found');
+      return;
+    }
 
-    const updatedBookings = bookings.map(b => 
-      b.id === id ? { ...b, technicianName, technicianPhone } : b
+    const customerName = booking.name;
+    
+    const technicianName = prompt(
+      `🔧 Assign Technician\n\nCustomer: ${customerName}\nService: ${booking.servicesText || 'Service Booking'}\n\nEnter technician name:`, 
+      booking.technician?.name || ''
     );
-    localStorage.setItem('bookings', JSON.stringify(updatedBookings));
-    loadBookings();
-    setSelectedBooking(null);
-    alert('Technician assigned!');
+    
+    if (technicianName === null || technicianName.trim() === '') {
+      if (technicianName === '') alert('Please enter a technician name.');
+      return;
+    }
+    
+    const technicianPhone = prompt(
+      `📞 Technician Contact\n\nTechnician: ${technicianName}\nCustomer: ${customerName}\n\nEnter technician phone number:`, 
+      booking.technician?.phone || ''
+    );
+    
+    if (technicianPhone === null || technicianPhone.trim() === '') {
+      if (technicianPhone === '') alert('Please enter a phone number.');
+      return;
+    }
+
+    const technicianEmail = prompt(
+      `📧 Technician Email (Optional)\n\nTechnician: ${technicianName}\nPhone: ${technicianPhone}\n\nEnter technician email (optional):`,
+      booking.technician?.email || ''
+    );
+
+    try {
+      const axteamAuth = JSON.parse(localStorage.getItem('axteamAuth') || '{}');
+      const token = axteamAuth.token;
+      
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        return;
+      }
+
+      console.log('🔧 Assigning technician via API...', { bookingId: booking._id, technicianName, technicianPhone });
+
+      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/bookings/${booking._id}/assign-technician`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          technicianName: technicianName.trim(),
+          technicianPhone: technicianPhone.trim(),
+          technicianEmail: technicianEmail?.trim() || null
+        })
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        // Reload bookings to get updated data
+        await loadBookings();
+        setSelectedBooking(null);
+        
+        alert(`✅ Technician Assigned Successfully!\n\nTechnician: ${technicianName}\nPhone: ${technicianPhone}\nCustomer: ${customerName}\n\n📱 Notifications sent to customer and technician.`);
+      } else {
+        console.error('❌ Failed to assign technician:', data);
+        alert(`Failed to assign technician: ${data.message || 'Unknown error'}`);
+      }
+
+    } catch (error) {
+      console.error('❌ Technician assignment error:', error);
+      alert('Failed to assign technician. Please check your connection and try again.');
+    }
   };
 
   const handleSupportStatusChange = (id, newStatus) => {
@@ -369,7 +429,7 @@ const MobileAdminDashboard = () => {
                     booking.status === 'Confirmed' ? 'bg-blue-100 text-blue-800' :
                     'bg-yellow-100 text-yellow-800'
                   }`}>
-                    {booking.status}
+                    {booking.status || 'Pending'}
                   </span>
                 </div>
                 
@@ -384,17 +444,43 @@ const MobileAdminDashboard = () => {
                   </div>
                   <div className="flex items-start gap-2">
                     <span>📍</span>
-                    <span className="text-gray-600">
-                      {booking.address?.street 
-                        ? `${booking.address.street}, ${booking.address.area || ''}, ${booking.address.city || 'Hyderabad'} - ${booking.address.pincode || ''}`
-                        : booking.fullAddress || `${booking.address}, ${booking.area || ''}, ${booking.city || 'Hyderabad'} - ${booking.pincode || ''}`
-                      }
-                    </span>
+                    <div className="flex-1">
+                      <span className="text-gray-600 block">
+                        {booking.address?.street 
+                          ? `${booking.address.street}, ${booking.address.area || ''}, ${booking.address.city || 'Hyderabad'} - ${booking.address.pincode || ''}`
+                          : booking.fullAddress || `${booking.address}, ${booking.area || ''}, ${booking.city || 'Hyderabad'} - ${booking.pincode || ''}`
+                        }
+                      </span>
+                      <div className="mt-1 flex gap-2">
+                        <a 
+                          href={`https://maps.google.com/?q=${encodeURIComponent(booking.fullAddress || `${booking.address?.street}, ${booking.address?.city}`)}`} 
+                          target="_blank" 
+                          rel="noopener noreferrer"
+                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                        >
+                          📍 View Map
+                        </a>
+                        <button 
+                          onClick={() => {
+                            if (navigator.share) {
+                              navigator.share({ text: `Customer address: ${booking.fullAddress || `${booking.address?.street}, ${booking.address?.city}`}` });
+                            } else {
+                              const address = booking.fullAddress || `${booking.address?.street}, ${booking.address?.city}`;
+                              navigator.clipboard.writeText(`Customer address: ${address}`);
+                              alert('Address copied to clipboard!');
+                            }
+                          }} 
+                          className="text-xs text-blue-600 hover:text-blue-800 underline"
+                        >
+                          Share
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  {booking.technicianName && (
+                  {(booking.technician?.name || booking.technicianName) && (
                     <div className="flex items-center gap-2">
                       <span>👨‍🔧</span>
-                      <span>{booking.technicianName} - {booking.technicianPhone}</span>
+                      <span>{booking.technician?.name || booking.technicianName} - {booking.technician?.phone || booking.technicianPhone}</span>
                     </div>
                   )}
                 </div>
@@ -456,7 +542,7 @@ const MobileAdminDashboard = () => {
                         onClick={() => handleAssignTechnician(selectedBooking._id || selectedBooking.id)}
                         className="p-3 bg-blue-600 text-white rounded-lg"
                       >
-                        {selectedBooking.technicianName ? 'Change Technician' : 'Assign Technician'}
+                        {(selectedBooking.technician?.name || selectedBooking.technicianName) ? 'Change Technician' : 'Assign Technician'}
                       </button>
                       <button
                         onClick={() => handleDeleteBooking(selectedBooking._id || selectedBooking.id)}
