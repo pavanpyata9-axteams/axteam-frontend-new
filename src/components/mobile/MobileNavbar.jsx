@@ -50,13 +50,17 @@ const MobileNavbar = () => {
     <nav className="bg-white shadow-lg sticky top-0 z-50 mobile-nav-container">
       <div className="px-4 py-3">
         <div className="flex justify-between items-center">
-          {/* Logo - Smaller for mobile */}
-          <Link to="/" className="flex items-center">
+          {/* Logo - Enhanced for mobile */}
+          <Link to="/" className="flex items-center space-x-2">
             <img 
-              src="/axteam-logo.jpg" 
+              src="/assets/icons/axteam-logo.jpg" 
               alt="AX Team" 
-              className="h-10 w-auto object-contain"
+              className="h-12 w-auto object-contain"
             />
+            <div className="flex flex-col leading-none">
+              <span className="text-lg font-bold text-gray-900">AX</span>
+              <span className="text-lg font-bold text-red-600">TEAM</span>
+            </div>
           </Link>
 
           {/* Right side - User icon + Menu button */}
