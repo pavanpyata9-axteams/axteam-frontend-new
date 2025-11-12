@@ -970,6 +970,7 @@ const AdminDashboard = () => {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Service</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Address</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Technician</th>
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
@@ -1047,6 +1048,34 @@ const AdminDashboard = () => {
                               <a href={`https://wa.me/${booking.phone.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer" className="text-sm text-green-600 hover:text-green-800 block">
                                 💬 WhatsApp
                               </a>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="text-sm text-gray-900">
+                              {booking.fullAddress ? booking.fullAddress.substring(0, 50) + (booking.fullAddress.length > 50 ? '...' : '') : 'No address'}
+                            </div>
+                            <div className="mt-2 space-y-1">
+                              <a 
+                                href={`https://maps.google.com/?q=${encodeURIComponent(booking.fullAddress || `${booking.address?.street}, ${booking.address?.city}`)}`} 
+                                target="_blank" 
+                                rel="noopener noreferrer"
+                                className="text-xs text-blue-600 hover:text-blue-800 underline block"
+                              >
+                                📍 View Map
+                              </a>
+                              <button 
+                                onClick={() => {
+                                  if (navigator.share) {
+                                    navigator.share({ text: `Customer address: ${booking.fullAddress}` });
+                                  } else {
+                                    navigator.clipboard.writeText(`Customer address: ${booking.fullAddress}`);
+                                    alert('Address copied to clipboard!');
+                                  }
+                                }} 
+                                className="text-xs text-blue-600 hover:text-blue-800 underline block"
+                              >
+                                Share
+                              </button>
                             </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
