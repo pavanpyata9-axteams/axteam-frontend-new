@@ -9,7 +9,7 @@ const MobileFooter = () => {
         {/* Company Info - Centered for mobile */}
         <div className="text-center mb-8">
           <img 
-            src="/axteam-logo.jpg" 
+            src="/assets/icons/axteam-logo.jpg" 
             alt="AX Team Services" 
             className="h-12 w-auto mx-auto mb-4"
           />
