@@ -10,7 +10,7 @@ const Footer = () => {
           {/* Company Info */}
           <div className="col-span-1 md:col-span-2">
             <img 
-              src="/axteam-logo.jpg" 
+              src="/assets/icons/axteam-logo.jpg" 
               alt="AX Team Services" 
               className="h-16 w-auto mb-4"
             />
