@@ -111,7 +111,7 @@ const MobileHome = () => {
           playsInline
           preload="metadata"
         >
-          <source src="/Expert Home Services.mp4" type="video/mp4" />
+          <source src="/assets/videos/expert-home-services.mp4" type="video/mp4" />
         </video>
         
         {/* Overlay for better text readability on mobile */}
