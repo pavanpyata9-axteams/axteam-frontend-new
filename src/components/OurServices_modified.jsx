@@ -121,7 +121,7 @@ const OurServices = () => {
           <div className="text-center mb-8">
             <div className="mb-8">
               <img 
-                src="/header-images/appliance-services-header.png" 
+                src="/assets/hero/appliance-services-header.png" 
                 alt="Appliance Services"
                 className="w-full max-w-md mx-auto h-auto object-contain"
                 onError={(e) => {
@@ -179,7 +179,7 @@ const OurServices = () => {
           <div className="text-center mb-8">
             <div className="mb-8">
               <img 
-                src="/header-images/home-services-header.png" 
+                src="/assets/hero/home-services-header.png" 
                 alt="Home Services & Repair"
                 className="w-full max-w-md mx-auto h-auto object-contain"
                 onError={(e) => {
