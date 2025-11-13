@@ -1,5 +1,4 @@
 import { Link } from 'react-router-dom';
-import Reviews from '../../components/Reviews';
 import { useEffect, useState } from 'react';
 import MobileOurServices from '../../components/mobile/MobileOurServices';
 import { reviewService } from '../../services/reviewService';
@@ -289,8 +288,6 @@ const MobileHome = () => {
         </div>
       </section>
 
-      {/* Customer Reviews Section */}
-      <Reviews />
     </div>
   );
 };
