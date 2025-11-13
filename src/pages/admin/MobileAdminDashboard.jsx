@@ -65,10 +65,12 @@ const MobileAdminDashboard = () => {
       const response = await bookingService.getAllBookings();
       
       if (response.success && response.data && response.data.bookings) {
-        setBookings(response.data.bookings);
-        console.log('✅ [MobileAdminDashboard] Loaded bookings:', response.data.bookings.length);
+        const bookings = response.data.data?.bookings || response.data.bookings || [];
+        setBookings(Array.isArray(bookings) ? bookings : []);
+        console.log('✅ [MobileAdminDashboard] Loaded bookings:', bookings.length);
       } else {
         console.error('❌ [MobileAdminDashboard] Failed to load bookings:', response);
+        setBookings([]);
       }
     } catch (error) {
       console.error('❌ [MobileAdminDashboard] Error loading bookings:', error);
@@ -426,7 +428,7 @@ const MobileAdminDashboard = () => {
                 🔄 Refresh
               </button>
             </div>
-            {bookings.map((booking) => (
+            {Array.isArray(bookings) ? bookings.map((booking) => (
               <div key={booking._id || booking.id} className="bg-white rounded-lg shadow p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
@@ -490,6 +492,11 @@ const MobileAdminDashboard = () => {
                     <div className="flex items-center gap-2">
                       <span>👨‍🔧</span>
                       <span>{booking.technician?.name || booking.technicianName} - {booking.technician?.phone || booking.technicianPhone}</span>
+                      {(booking.technician?.email || booking.technicianEmail) && (
+                        <div className="text-xs text-gray-600 ml-2">
+                          📧 {booking.technician?.email || booking.technicianEmail || "N/A"}
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
@@ -511,7 +518,7 @@ const MobileAdminDashboard = () => {
                   </div>
                 </div>
               </div>
-            ))}
+            )) : []}
 
             {/* Booking Detail Modal */}
             {selectedBooking && (
@@ -825,7 +832,7 @@ const MobileAdminDashboard = () => {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              {images.map((image) => (
+              {Array.isArray(images) ? images.map((image) => (
                 <div key={image.id} className="bg-white rounded-lg shadow overflow-hidden">
                   {image.mediaType === 'video' ? (
                     <video 
@@ -851,7 +858,7 @@ const MobileAdminDashboard = () => {
                     </button>
                   </div>
                 </div>
-              ))}
+              )) : []}
             </div>
           </div>
         )}
@@ -860,7 +867,7 @@ const MobileAdminDashboard = () => {
         {activeTab === 'users' && (
           <div className="space-y-4">
             <h2 className="text-xl font-bold text-gray-800">All Users</h2>
-            {users.map((user) => (
+            {Array.isArray(users) ? users.map((user) => (
               <div key={user.email} className="bg-white rounded-lg shadow p-4">
                 <div className="flex justify-between items-center">
                   <div>
@@ -878,7 +885,7 @@ const MobileAdminDashboard = () => {
                   </button>
                 </div>
               </div>
-            ))}
+            )) : []}
           </div>
         )}
       </div>
