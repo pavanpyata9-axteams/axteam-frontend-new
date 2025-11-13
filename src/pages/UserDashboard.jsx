@@ -106,8 +106,9 @@ const UserDashboard = () => {
           status: booking.status,
           date: new Date(booking.createdAt).toLocaleDateString(),
           createdAt: booking.createdAt,
-          technicianName: booking.technicianName,
-          technicianPhone: booking.technicianPhone,
+          technicianName: booking.technician?.name,
+          technicianPhone: booking.technician?.phone,
+          technicianEmail: booking.technician?.email,
           estimatedCost: booking.estimatedCost,
           actualCost: booking.actualCost,
           rating: booking.rating,
@@ -364,13 +365,18 @@ const UserDashboard = () => {
                         </span>
                       </td>
                       <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                        {booking.technicianName ? (
+                        {booking.technician?.name ? (
                           <div>
-                            <p className="font-medium text-gray-900">{booking.technicianName}</p>
-                            {booking.technicianPhone && (
-                              <a href={`tel:${booking.technicianPhone}`} className="text-blue-600 hover:underline">
-                                📞 {booking.technicianPhone}
+                            <p className="font-medium text-gray-900">{booking.technician.name}</p>
+                            {booking.technician.phone && (
+                              <a href={`tel:${booking.technician.phone}`} className="text-blue-600 hover:underline">
+                                📞 {booking.technician.phone}
                               </a>
+                            )}
+                            {booking.technician.email && (
+                              <div className="text-sm text-gray-600">
+                                📧 {booking.technician.email}
+                              </div>
                             )}
                           </div>
                         ) : (
@@ -449,15 +455,22 @@ const UserDashboard = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {booking.technicianName && (
+                        {booking.technician?.name ? (
                           <div>
-                            <p className="font-medium text-gray-900">{booking.technicianName}</p>
-                            {booking.technicianPhone && (
-                              <a href={`tel:${booking.technicianPhone}`} className="text-blue-600 hover:underline">
-                                📞 {booking.technicianPhone}
+                            <p className="font-medium text-gray-900">{booking.technician.name}</p>
+                            {booking.technician.phone && (
+                              <a href={`tel:${booking.technician.phone}`} className="text-blue-600 hover:underline">
+                                📞 {booking.technician.phone}
                               </a>
                             )}
+                            {booking.technician.email && (
+                              <div className="text-sm text-gray-600">
+                                📧 {booking.technician.email}
+                              </div>
+                            )}
                           </div>
+                        ) : (
+                          <span className="text-gray-400">Not assigned</span>
                         )}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
