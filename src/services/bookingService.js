@@ -5,7 +5,7 @@ export const bookingService = {
   deleteBooking: async (bookingId) => {
     try {
       console.log('🗑️ [bookingService] Deleting booking:', bookingId);
-      const response = await api.delete(`/api/bookings/${bookingId}`);
+      const response = await api.delete(`/bookings/${bookingId}`);
       console.log('✅ [bookingService] Booking deleted:', response.data);
       return response.data;
     } catch (error) {
@@ -18,7 +18,7 @@ export const bookingService = {
   addFeedback: async (bookingId, feedbackData) => {
     try {
       console.log('⭐ [bookingService] Adding feedback:', { bookingId, feedbackData });
-      const response = await api.patch(`/api/bookings/feedback/${bookingId}`, feedbackData);
+      const response = await api.patch(`/bookings/feedback/${bookingId}`, feedbackData);
       console.log('✅ [bookingService] Feedback added:', response.data);
       return response.data;
     } catch (error) {
@@ -32,7 +32,7 @@ export const bookingService = {
     try {
       console.log('📋 [bookingService] Fetching all bookings:', filters);
       const queryParams = new URLSearchParams(filters).toString();
-      const response = await api.get(`/api/bookings/all${queryParams ? `?${queryParams}` : ''}`);
+      const response = await api.get(`/bookings/all${queryParams ? `?${queryParams}` : ''}`);
       console.log('✅ [bookingService] All bookings fetched:', response.data);
       return response.data;
     } catch (error) {
@@ -53,7 +53,7 @@ export const bookingService = {
       }
       
       console.log('🔄 [bookingService] Updating booking status:', { bookingId, status });
-      const response = await api.patch(`/api/bookings/status/${bookingId}`, { status });
+      const response = await api.patch(`/bookings/status/${bookingId}`, { status });
       console.log('✅ [bookingService] Booking status updated:', response.data);
       return response.data;
     } catch (error) {
@@ -65,7 +65,7 @@ export const bookingService = {
   createBooking: async (bookingData) => {
     try {
       console.log('🚀 Sending booking request:', bookingData);
-      const response = await api.post('/api/bookings/create', bookingData);
+      const response = await api.post('/bookings/create', bookingData);
       console.log('✅ Booking response:', response.data);
       return response.data;
     } catch (error) {
@@ -78,7 +78,7 @@ export const bookingService = {
   getUserBookings: async (userId) => {
     try {
       console.log('🔍 [bookingService] Fetching bookings for userId:', userId);
-      console.log('🌐 [bookingService] API Base URL:', import.meta.env.VITE_API_URL);
+      console.log('🌐 [bookingService] API Base URL: https://axteam-backend.onrender.com/api');
       
       // FIXED: Get token from axteamAuth as per prompt requirements
       const axteamAuth = JSON.parse(localStorage.getItem('axteamAuth') || '{}');
@@ -98,7 +98,7 @@ export const bookingService = {
         throw new Error('Authentication token required');
       }
       
-      const apiUrl = `/api/bookings/user/${userId}`;
+      const apiUrl = `/bookings/user/${userId}`;
       console.log('🔗 [bookingService] Making request to:', apiUrl);
       
       const response = await api.get(apiUrl);
@@ -124,7 +124,7 @@ export const bookingService = {
   // Cancel booking
   cancelBooking: async (bookingId) => {
     try {
-      const response = await api.put(`/api/bookings/${bookingId}/cancel`);
+      const response = await api.put(`/bookings/${bookingId}/cancel`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to cancel booking' };
