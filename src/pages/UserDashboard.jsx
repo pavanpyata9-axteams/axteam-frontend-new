@@ -365,17 +365,17 @@ const UserDashboard = () => {
                         </span>
                       </td>
                       <td className="px-4 md:px-6 py-4 whitespace-nowrap">
-                        {booking.technician?.name ? (
+                        {booking.technicianName || booking.technician?.name ? (
                           <div>
-                            <p className="font-medium text-gray-900">{booking.technician.name}</p>
-                            {booking.technician.phone && (
-                              <a href={`tel:${booking.technician.phone}`} className="text-blue-600 hover:underline">
-                                📞 {booking.technician.phone}
+                            <p className="font-medium text-gray-900">{booking.technicianName || booking.technician?.name}</p>
+                            {(booking.technicianPhone || booking.technician?.phone) && (
+                              <a href={`tel:${booking.technicianPhone || booking.technician?.phone}`} className="text-blue-600 hover:underline">
+                                📞 {booking.technicianPhone || booking.technician?.phone}
                               </a>
                             )}
-                            {booking.technician.email && (
+                            {(booking.technicianEmail || booking.technician?.email) && (
                               <div className="text-sm text-gray-600">
-                                📧 {booking.technician.email}
+                                📧 {booking.technicianEmail || booking.technician?.email}
                               </div>
                             )}
                           </div>
@@ -455,17 +455,17 @@ const UserDashboard = () => {
                         </span>
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm">
-                        {booking.technician?.name ? (
+                        {booking.technicianName || booking.technician?.name ? (
                           <div>
-                            <p className="font-medium text-gray-900">{booking.technician.name}</p>
-                            {booking.technician.phone && (
-                              <a href={`tel:${booking.technician.phone}`} className="text-blue-600 hover:underline">
-                                📞 {booking.technician.phone}
+                            <p className="font-medium text-gray-900">{booking.technicianName || booking.technician?.name}</p>
+                            {(booking.technicianPhone || booking.technician?.phone) && (
+                              <a href={`tel:${booking.technicianPhone || booking.technician?.phone}`} className="text-blue-600 hover:underline">
+                                📞 {booking.technicianPhone || booking.technician?.phone}
                               </a>
                             )}
-                            {booking.technician.email && (
+                            {(booking.technicianEmail || booking.technician?.email) && (
                               <div className="text-sm text-gray-600">
-                                📧 {booking.technician.email}
+                                📧 {booking.technicianEmail || booking.technician?.email}
                               </div>
                             )}
                           </div>
