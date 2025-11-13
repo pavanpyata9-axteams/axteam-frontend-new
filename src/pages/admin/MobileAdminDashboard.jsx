@@ -38,9 +38,16 @@ const MobileAdminDashboard = () => {
     ]);
   };
 
-  const loadImages = () => {
-    const savedImages = JSON.parse(localStorage.getItem('galleryImages') || '[]');
-    setImages(savedImages);
+  const loadImages = async () => {
+    try {
+      const response = await api.get('/gallery');
+      if (response.data.success) {
+        setImages(response.data.data);
+      }
+    } catch (error) {
+      console.error('Failed to load images:', error);
+      setImages([]);
+    }
   };
 
   const loadBookings = async () => {
@@ -73,9 +80,15 @@ const MobileAdminDashboard = () => {
     setSupportRequests(savedSupport);
   };
 
-  const loadUsers = () => {
-    const savedUsers = JSON.parse(localStorage.getItem('users') || '[]');
-    setUsers(savedUsers);
+  const loadUsers = async () => {
+    try {
+      const response = await api.get('/admin/users');
+      const users = response.data.data;
+      setUsers(users);
+    } catch (error) {
+      console.error('Failed to load users:', error);
+      setUsers([]);
+    }
   };
 
   const handleFileChange = (e) => {
@@ -99,25 +112,27 @@ const MobileAdminDashboard = () => {
   const handleUpload = async () => {
     if (newImage.title && newImage.file && newImage.category) {
       try {
-        const mediaData = await convertToBase64(newImage.file);
-        const savedImages = JSON.parse(localStorage.getItem('galleryImages') || '[]');
-        const newMediaData = {
-          id: Date.now(),
-          title: newImage.title,
-          category: newImage.category,
-          section: newImage.section,
-          mediaData: mediaData,
-          mediaType: newImage.file.type.startsWith('video/') ? 'video' : 'image',
-          date: new Date().toLocaleDateString()
-        };
-        savedImages.push(newMediaData);
-        localStorage.setItem('galleryImages', JSON.stringify(savedImages));
-        loadImages();
-        setNewImage({ title: '', file: null, category: '', section: 'Appliance Services' });
-        setShowUpload(false);
-        alert('Media uploaded successfully!');
+        const formData = new FormData();
+        formData.append('file', newImage.file);
+        formData.append('title', newImage.title);
+        formData.append('category', newImage.category);
+        formData.append('section', newImage.section);
+
+        const response = await api.post("/gallery/upload", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
+
+        if (response.data.success) {
+          loadImages();
+          setNewImage({ title: '', file: null, category: '', section: 'Appliance Services' });
+          setShowUpload(false);
+          alert('Media uploaded successfully!');
+        } else {
+          alert('Upload failed: ' + response.data.message);
+        }
       } catch (error) {
-        alert('Error uploading media');
+        console.error('Upload error:', error);
+        alert('Error uploading media: ' + error.message);
       }
     }
   };
