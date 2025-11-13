@@ -6,7 +6,7 @@ export const authService = {
     try {
       console.log('📝 [authService] Attempting registration with:', { name: userData.name, email: userData.email, phone: userData.phone });
       
-      const response = await api.post('/api/auth/register', userData);
+      const response = await api.post('/auth/register', userData);
       console.log('✅ [authService] Registration response received:', response.data);
       
       // Validate response structure
@@ -47,7 +47,7 @@ export const authService = {
         password: credentials.password
       };
       
-      const response = await api.post('/api/auth/login', loginPayload);
+      const response = await api.post('/auth/login', loginPayload);
       console.log('✅ [authService] Login response received:', response.data);
       
       // ✅ FIXED: Handle response according to prompt structure
@@ -97,7 +97,7 @@ export const authService = {
         password: credentials.password
       };
       
-      const response = await api.post('/api/auth/admin-login', loginPayload);
+      const response = await api.post('/auth/admin-login', loginPayload);
       console.log('✅ [authService] Admin login response received:', response.data);
       
       // Handle response according to prompt structure
@@ -130,7 +130,7 @@ export const authService = {
   // Get current user (GET /auth/me)
   getMe: async () => {
     try {
-      const response = await api.get('/api/auth/me');
+      const response = await api.get('/auth/me');
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to get current user' };
@@ -154,7 +154,7 @@ export const authService = {
   // Get current user profile
   getProfile: async () => {
     try {
-      const response = await api.get('/api/auth/profile');
+      const response = await api.get('/auth/profile');
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to get profile' };
