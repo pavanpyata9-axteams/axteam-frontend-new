@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../api/axios';
 import { useNavigate } from 'react-router-dom';
 import { sessionManager } from '../utils/sessionManager';
 import useDeviceDetection from '../hooks/useDeviceDetection';
@@ -82,15 +83,9 @@ const UserDashboard = () => {
       console.log('🔍 [UserDashboard] Fetching bookings for userId:', user._id);
       
       // ✅ FORCE FRESH API CALL: Direct fetch to ensure no caching
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/user/${user._id}`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get(`/bookings/user/${user._id}`);
 
-      const data = await response.json();
+      const data = response.data;
       console.log('📊 [UserDashboard] Fresh backend response:', data);
       
       if (data.success && data.data.bookings) {
