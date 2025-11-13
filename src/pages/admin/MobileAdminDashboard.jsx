@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../../api/axios';
 import { reviewService } from '../../services/reviewService';
 import { useNavigate } from 'react-router-dom';
 import { bookingService } from '../../services/bookingService';
@@ -242,22 +243,15 @@ const MobileAdminDashboard = () => {
 
       console.log('🔧 Assigning technician via API...', { bookingId: booking._id, technicianName, technicianPhone });
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/bookings/${booking._id}/assign-technician`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          technicianName: technicianName.trim(),
-          technicianPhone: technicianPhone.trim(),
-          technicianEmail: technicianEmail?.trim() || null
-        })
+      const response = await api.post(`/admin/bookings/${booking._id}/assign-technician`, {
+        technicianName: technicianName.trim(),
+        technicianPhone: technicianPhone.trim(),
+        technicianEmail: technicianEmail?.trim() || null
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok && data.success) {
+      if (data.success) {
         // Reload bookings to get updated data
         await loadBookings();
         setSelectedBooking(null);
