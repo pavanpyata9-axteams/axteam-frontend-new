@@ -21,9 +21,9 @@ api.interceptors.request.use(
         console.log('🔗 [axios] Request to:', config.url, 'with token');
       }
     } else {
-      // Check if this is a public route (like /api/reviews/homepage)
-      const isPublicRoute = config.url.includes('/api/reviews/homepage') || 
-                           config.url.includes('/api/services/') || 
+      // Check if this is a public route (like /reviews/homepage)
+      const isPublicRoute = config.url.includes('/reviews/homepage') || 
+                           config.url.includes('/services/') || 
                            config.url.includes('/health');
       if (!isPublicRoute) {
         console.warn('⚠️ [axios] No axteamAuth found for request to:', config.url);
