@@ -4,7 +4,7 @@ export const reviewService = {
   // Create a new review
   createReview: async (reviewData) => {
     try {
-      const response = await axios.post('/api/reviews/create', reviewData);
+      const response = await axios.post('/reviews/create', reviewData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to create review' };
@@ -14,7 +14,7 @@ export const reviewService = {
   // Get reviews for homepage
   getHomepageReviews: async (limit = 6) => {
     try {
-      const response = await axios.get(`/api/reviews/homepage?limit=${limit}`);
+      const response = await axios.get(`/reviews/homepage?limit=${limit}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch reviews' };
@@ -25,7 +25,7 @@ export const reviewService = {
   getAllReviews: async (params = {}) => {
     try {
       const queryParams = new URLSearchParams(params).toString();
-      const response = await axios.get(`/api/reviews/all?${queryParams}`);
+      const response = await axios.get(`/reviews/all?${queryParams}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to fetch reviews' };
@@ -35,7 +35,7 @@ export const reviewService = {
   // Reply to a review (Admin)
   replyToReview: async (reviewId, replyText) => {
     try {
-      const response = await axios.patch(`/api/reviews/reply/${reviewId}`, {
+      const response = await axios.patch(`/reviews/reply/${reviewId}`, {
         replyText
       });
       return response.data;
@@ -47,7 +47,7 @@ export const reviewService = {
   // Update review approval (Admin)
   updateReviewApproval: async (reviewId, status) => {
     try {
-      const response = await axios.patch(`/api/reviews/approve/${reviewId}`, status);
+      const response = await axios.patch(`/reviews/approve/${reviewId}`, status);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update review status' };
@@ -57,7 +57,7 @@ export const reviewService = {
   // Delete review (Admin)
   deleteReview: async (reviewId) => {
     try {
-      const response = await axios.delete(`/api/reviews/${reviewId}`);
+      const response = await axios.delete(`/reviews/${reviewId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete review' };
