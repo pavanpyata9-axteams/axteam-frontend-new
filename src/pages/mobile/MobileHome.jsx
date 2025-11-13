@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useEffect, useState } from 'react';
 import MobileOurServices from '../../components/mobile/MobileOurServices';
 import { reviewService } from '../../services/reviewService';
+import { getGallery } from '../../services/galleryService';
 
 const MobileHome = () => {
   const [galleryItems, setGalleryItems] = useState([]);
@@ -10,23 +11,23 @@ const MobileHome = () => {
   const [reviewIndex, setReviewIndex] = useState(0);
 
   useEffect(() => {
-    const loadData = () => {
-      const savedGallery = JSON.parse(localStorage.getItem('galleryImages') || '[]');
-      setGalleryItems(savedGallery);
+    const loadData = async () => {
+      try {
+        const response = await getGallery();
+        if (response.data.success && response.data.data) {
+          setGalleryItems(Array.isArray(response.data.data) ? response.data.data : []);
+        } else {
+          setGalleryItems([]);
+        }
+      } catch (error) {
+        console.error('Failed to load gallery:', error);
+        setGalleryItems([]);
+      }
     };
 
     loadData();
-    const onStorage = (e) => {
-      if (e.key === 'galleryImages') {
-        loadData();
-      }
-    };
-    window.addEventListener('storage', onStorage);
-    const refresh = setInterval(loadData, 10000);
-    return () => {
-      window.removeEventListener('storage', onStorage);
-      clearInterval(refresh);
-    };
+    const refresh = setInterval(loadData, 30000); // Refresh every 30 seconds
+    return () => clearInterval(refresh);
   }, []);
 
   // Load reviews from API
@@ -160,16 +161,16 @@ const MobileHome = () => {
               <>
                 {currentItem.mediaType === 'video' ? (
                   <video
-                    src={currentItem.mediaData}
+                    src={currentItem.filePath || currentItem.mediaData}
                     className="w-full h-full object-cover"
                     autoPlay
                     loop
                     muted
                     playsInline
                   />
-                ) : currentItem.mediaData ? (
+                ) : currentItem.filePath || currentItem.mediaData ? (
                   <img
-                    src={currentItem.mediaData}
+                    src={currentItem.filePath || currentItem.mediaData}
                     alt={currentItem.title}
                     className="w-full h-full object-cover"
                   />
