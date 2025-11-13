@@ -4,7 +4,7 @@ export const contactService = {
   // Submit contact form
   submitContactForm: async (formData) => {
     try {
-      const response = await api.post('/api/contact', formData);
+      const response = await api.post('/contact', formData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to submit contact form' };
@@ -14,7 +14,7 @@ export const contactService = {
   // Get all contact submissions (admin only)
   getAllContacts: async () => {
     try {
-      const response = await api.get('/api/admin/contacts');
+      const response = await api.get('/admin/contacts');
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to get contacts' };
