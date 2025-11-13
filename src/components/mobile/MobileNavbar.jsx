@@ -47,8 +47,8 @@ const MobileNavbar = () => {
   }, [isMenuOpen]);
 
   return (
-    <nav className="bg-white shadow-lg sticky top-0 z-50 mobile-nav-container">
-      <div className="px-4 py-3">
+    <nav className="bg-white shadow-lg sticky top-0 z-50 mobile-nav-container" style={{ paddingTop: 'env(safe-area-inset-top)' }}>
+      <div className="px-4 py-4">
         <div className="flex justify-between items-center">
           {/* Logo - Enhanced for mobile */}
           <Link to="/" className="flex items-center space-x-2">
@@ -57,9 +57,16 @@ const MobileNavbar = () => {
               alt="AX Team" 
               className="h-12 w-auto object-contain"
             />
-            <div className="flex flex-col leading-none">
-              <span className="text-lg font-bold text-gray-900">AX</span>
-              <span className="text-lg font-bold text-red-600">TEAM</span>
+            <div className="brand-text" style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '4px',
+              fontSize: '20px',
+              fontWeight: '700',
+              lineHeight: '1'
+            }}>
+              <span className="text-gray-900">AX</span>
+              <span className="text-red-600">TEAM</span>
             </div>
           </Link>
 
@@ -101,7 +108,7 @@ const MobileNavbar = () => {
         isMenuOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
       }`}>
         <div className="bg-gray-50 border-t border-gray-200">
-          <div className="px-4 py-3 space-y-2">
+          <div className="px-4 py-4 space-y-3">
             {navLinks.map((link) => (
               <Link
                 key={link.path}
