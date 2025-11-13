@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import api from '../../api/axios';
 import { reviewService } from '../../services/reviewService';
 import { useNavigate } from 'react-router-dom';
 import useDeviceDetection from '../../hooks/useDeviceDetection';
@@ -58,15 +59,9 @@ const AdminDashboard = () => {
 
       console.log('🔍 [AdminDashboard] Loading all bookings from backend...');
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/bookings/enhanced`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get('/admin/bookings/enhanced');
 
-      const data = await response.json();
+      const data = response.data;
       console.log('📊 [AdminDashboard] Backend response:', data);
       
       if (data.success && data.data.bookings) {
@@ -114,18 +109,11 @@ const AdminDashboard = () => {
       
       if (!token) return;
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/stats`, {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get('/admin/stats');
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('📊 Stats loaded from database:', data.data.stats);
-        // Stats will be calculated in the component
-      }
+      const data = response.data;
+      console.log('📊 Stats loaded from database:', data.data.stats);
+      // Stats will be calculated in the component
     } catch (error) {
       console.error('❌ Failed to load stats:', error);
     }
@@ -155,15 +143,9 @@ const AdminDashboard = () => {
 
       console.log('🔍 [AdminDashboard] Loading all users from backend...');
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users`, {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.get('/admin/users');
 
-      const data = await response.json();
+      const data = response.data;
       console.log('👥 [AdminDashboard] Users response:', data);
       
       if (data.success && data.data.users) {
@@ -281,15 +263,9 @@ const AdminDashboard = () => {
       
       console.log('🗑️ [AdminDashboard] Deleting user:', userId);
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
+      const response = await api.delete(`/admin/users/${userId}`);
       
-      const data = await response.json();
+      const data = response.data;
       
       if (data.success) {
         alert(`✅ User Deleted Successfully!\n\n` +
@@ -331,16 +307,9 @@ const AdminDashboard = () => {
       
       console.log('🔄 [AdminDashboard] Toggling user status:', userId, 'to:', newStatus);
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/users/${userId}/status`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ isActive: newStatus })
-      });
+      const response = await api.patch(`/admin/users/${userId}/status`, { isActive: newStatus });
       
-      const data = await response.json();
+      const data = response.data;
       
       if (data.success) {
         alert(`✅ User ${newStatus ? 'Activated' : 'Deactivated'} Successfully!`);
@@ -433,18 +402,11 @@ const AdminDashboard = () => {
 
       console.log('🔄 [AdminDashboard] Updating booking status:', { id, newStatus });
       
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/bookings/status/${id}`, {
-        method: 'PATCH',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ status: newStatus })
-      });
+      const response = await api.patch(`/bookings/status/${id}`, { status: newStatus });
 
-      const data = await response.json();
+      const data = response.data;
       
-      if (response.ok && data.success) {
+      if (data.success) {
         console.log('✅ [AdminDashboard] Status updated successfully');
         await loadAllBookings(); // Refresh from backend
         alert(`Booking status updated to ${newStatus}. Customer has been notified.`);
@@ -520,22 +482,15 @@ const AdminDashboard = () => {
 
       console.log('🔧 Assigning technician via API...', { bookingId: booking._id, technicianName, technicianPhone });
 
-      const response = await fetch(`${import.meta.env.VITE_API_URL}/api/admin/bookings/${booking._id}/assign-technician`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          technicianName: technicianName.trim(),
-          technicianPhone: technicianPhone.trim(),
-          technicianEmail: technicianEmail?.trim() || null
-        })
+      const response = await api.post(`/admin/bookings/${booking._id}/assign-technician`, {
+        technicianName: technicianName.trim(),
+        technicianPhone: technicianPhone.trim(),
+        technicianEmail: technicianEmail?.trim() || null
       });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (response.ok && data.success) {
+      if (data.success) {
         // Reload bookings to get updated data
         await loadAllBookings();
         setSelectedBooking(null);
@@ -642,14 +597,9 @@ const AdminDashboard = () => {
 
       console.log('📊 Exporting bookings...');
 
-      const response = await fetch('/api/admin/export/bookings', {
-        method: 'GET',
-        headers: {
-          'Authorization': `Bearer ${token}`
-        }
-      });
+      const response = await api.get('/admin/export/bookings');
 
-      if (response.ok) {
+      if (response.data) {
         // Create download link
         const blob = await response.blob();
         const url = window.URL.createObjectURL(blob);
@@ -664,7 +614,7 @@ const AdminDashboard = () => {
         
         alert('📊 Bookings exported successfully!');
       } else {
-        const error = await response.json();
+        const error = response.data;
         alert(`Failed to export bookings: ${error.message || 'Unknown error'}`);
       }
 
