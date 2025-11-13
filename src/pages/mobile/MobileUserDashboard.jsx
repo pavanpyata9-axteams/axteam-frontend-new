@@ -353,14 +353,19 @@ const MobileUserDashboard = () => {
                       )}
                     </div>
                     
-                    {booking.technicianName ? (
+                    {booking.technician?.name ? (
                       <div className="flex items-center gap-2">
                         <span>👨‍🔧</span>
-                        <span>{booking.technicianName}</span>
-                        {booking.technicianPhone && (
-                          <a href={`tel:${booking.technicianPhone}`} className="text-primary-600 underline">
+                        <span>{booking.technician.name}</span>
+                        {booking.technician.phone && (
+                          <a href={`tel:${booking.technician.phone}`} className="text-primary-600 underline">
                             📞
                           </a>
+                        )}
+                        {booking.technician.email && (
+                          <div className="text-xs text-gray-600 ml-6">
+                            📧 {booking.technician.email}
+                          </div>
                         )}
                       </div>
                     ) : (
@@ -424,14 +429,19 @@ const MobileUserDashboard = () => {
                       <span>{booking.preferredDate || booking.date}</span>
                     </div>
                     
-                    {booking.technicianName && (
+                    {booking.technician?.name && (
                       <div className="flex items-center gap-2">
                         <span>👨‍🔧</span>
-                        <span>{booking.technicianName}</span>
-                        {booking.technicianPhone && (
-                          <a href={`tel:${booking.technicianPhone}`} className="text-primary-600 underline">
+                        <span>{booking.technician.name}</span>
+                        {booking.technician.phone && (
+                          <a href={`tel:${booking.technician.phone}`} className="text-primary-600 underline">
                             📞
                           </a>
+                        )}
+                        {booking.technician.email && (
+                          <div className="text-xs text-gray-600 ml-6">
+                            📧 {booking.technician.email}
+                          </div>
                         )}
                       </div>
                     )}
