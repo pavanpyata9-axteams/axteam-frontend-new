@@ -4,7 +4,7 @@ export const serviceService = {
   // Get all services
   getAllServices: async () => {
     try {
-      const response = await api.get('/api/services/list');
+      const response = await api.get('/services/list');
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to get services' };
@@ -14,7 +14,7 @@ export const serviceService = {
   // Get service by ID
   getServiceById: async (serviceId) => {
     try {
-      const response = await api.get(`/api/services/${serviceId}`);
+      const response = await api.get(`/services/${serviceId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to get service' };
@@ -24,7 +24,7 @@ export const serviceService = {
   // Create service (admin only)
   createService: async (serviceData) => {
     try {
-      const response = await api.post('/api/services/add', serviceData);
+      const response = await api.post('/services/add', serviceData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to create service' };
@@ -34,7 +34,7 @@ export const serviceService = {
   // Update service (admin only)
   updateService: async (serviceId, serviceData) => {
     try {
-      const response = await api.patch(`/api/services/update/${serviceId}`, serviceData);
+      const response = await api.patch(`/services/update/${serviceId}`, serviceData);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update service' };
@@ -44,7 +44,7 @@ export const serviceService = {
   // Delete service (admin only)
   deleteService: async (serviceId) => {
     try {
-      const response = await api.delete(`/api/services/delete/${serviceId}`);
+      const response = await api.delete(`/services/delete/${serviceId}`);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to delete service' };
