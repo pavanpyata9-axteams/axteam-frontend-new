@@ -96,9 +96,14 @@ const MobileAdminDashboard = () => {
       
       console.log('⭐ [MobileAdminDashboard] Reviews response:', response);
       
-      const reviewItems = response.data.data;
-      setReviews(reviewItems);
-      console.log('✅ [MobileAdminDashboard] Loaded reviews:', reviewItems.length);
+      if (!response.data.data) {
+        console.error("Invalid review response:", response.data);
+        return;
+      }
+
+      const reviews = response.data.data;
+      setReviews(reviews);
+      console.log('✅ [MobileAdminDashboard] Loaded reviews:', reviews.length);
     } catch (error) {
       console.error('❌ [MobileAdminDashboard] Error loading reviews:', error);
       setReviews([]);
