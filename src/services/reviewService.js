@@ -47,10 +47,20 @@ export const reviewService = {
   // Update review approval (Admin)
   updateReviewApproval: async (reviewId, status) => {
     try {
-      const response = await axios.patch(`/reviews/approve/${reviewId}`, status);
+      const response = await axios.patch(`/reviews/${reviewId}/approve`, status);
       return response.data;
     } catch (error) {
       throw error.response?.data || { message: 'Failed to update review status' };
+    }
+  },
+
+  // Toggle review visibility (Admin)
+  toggleReviewVisibility: async (reviewId) => {
+    try {
+      const response = await axios.patch(`/reviews/${reviewId}/toggle-visibility`);
+      return response.data;
+    } catch (error) {
+      throw error.response?.data || { message: 'Failed to toggle review visibility' };
     }
   },
 
