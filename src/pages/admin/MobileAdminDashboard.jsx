@@ -12,6 +12,7 @@ const MobileAdminDashboard = () => {
   const [bookings, setBookings] = useState([]);
   const [supportRequests, setSupportRequests] = useState([]);
   const [users, setUsers] = useState([]);
+  const [reviews, setReviews] = useState([]);
   const [showUpload, setShowUpload] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [selectedBooking, setSelectedBooking] = useState(null);
@@ -34,14 +35,15 @@ const MobileAdminDashboard = () => {
       loadImages(),
       loadBookings(),
       loadSupportRequests(),
-      loadUsers()
+      loadUsers(),
+      loadReviews()
     ]);
   };
 
   const loadImages = async () => {
     try {
       console.log('🔍 [MobileAdminDashboard] Loading gallery from backend...');
-      const response = await api.get('/api/gallery');
+      const response = await api.get('/gallery');
       
       console.log('🖼️ [MobileAdminDashboard] Gallery response:', response.data);
       
@@ -89,6 +91,27 @@ const MobileAdminDashboard = () => {
   const loadSupportRequests = () => {
     const savedSupport = JSON.parse(localStorage.getItem('supportRequests') || '[]');
     setSupportRequests(savedSupport);
+  };
+
+  const loadReviews = async () => {
+    try {
+      console.log('🔍 [MobileAdminDashboard] Loading all reviews from backend...');
+      
+      const response = await reviewService.getAllReviews();
+      
+      console.log('⭐ [MobileAdminDashboard] Reviews response:', response);
+      
+      if (response.success && response.data && response.data.reviews) {
+        setReviews(response.data.reviews);
+        console.log('✅ [MobileAdminDashboard] Loaded reviews:', response.data.reviews.length);
+      } else {
+        console.error('❌ [MobileAdminDashboard] Failed to load reviews:', response);
+        setReviews([]);
+      }
+    } catch (error) {
+      console.error('❌ [MobileAdminDashboard] Error loading reviews:', error);
+      setReviews([]);
+    }
   };
 
   const loadUsers = async () => {
@@ -148,7 +171,7 @@ const MobileAdminDashboard = () => {
         formData.append('category', newImage.category);
         formData.append('section', newImage.section);
 
-        const response = await api.post("/api/gallery/upload", formData, {
+        const response = await api.post("/gallery/upload", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -171,7 +194,7 @@ const MobileAdminDashboard = () => {
     if (window.confirm('Delete this image?')) {
       try {
         console.log('🗑️ [MobileAdminDashboard] Deleting image:', id);
-        const response = await api.delete(`/api/gallery/${id}`);
+        const response = await api.delete(`/gallery/${id}`);
         
         if (response.data.success) {
           console.log('✅ [MobileAdminDashboard] Image deleted successfully');
@@ -333,6 +356,76 @@ const MobileAdminDashboard = () => {
     loadSupportRequests();
   };
 
+  const handleReplyToReview = async (reviewId, currentReply) => {
+    const reply = prompt('Reply to this review:', currentReply || '');
+    if (reply !== null && reply.trim() !== '') {
+      try {
+        console.log('💬 [MobileAdminDashboard] Replying to review:', reviewId);
+        
+        const response = await reviewService.replyToReview(reviewId, reply.trim());
+        
+        if (response.success) {
+          await loadReviews(); // Refresh reviews
+          alert('Reply posted successfully!');
+          console.log('✅ [MobileAdminDashboard] Reply posted successfully');
+        } else {
+          alert('Failed to post reply: ' + response.message);
+        }
+      } catch (error) {
+        console.error('❌ [MobileAdminDashboard] Error posting reply:', error);
+        alert('Error posting reply. Please try again.');
+      }
+    }
+  };
+
+  const handleToggleReviewApproval = async (reviewId, currentStatus) => {
+    try {
+      const newStatus = currentStatus === 'approved' ? 'pending' : 'approved';
+      console.log('👍 [MobileAdminDashboard] Toggling review approval:', reviewId, newStatus);
+      
+      const response = await reviewService.updateReviewApproval(reviewId, { status: newStatus });
+      
+      if (response.success) {
+        await loadReviews(); // Refresh reviews
+        alert(`Review ${newStatus === 'approved' ? 'approved' : 'marked as pending'}!`);
+        console.log('✅ [MobileAdminDashboard] Review status updated');
+      } else {
+        alert('Failed to update review status: ' + response.message);
+      }
+    } catch (error) {
+      console.error('❌ [MobileAdminDashboard] Error updating review status:', error);
+      alert('Error updating review status. Please try again.');
+    }
+  };
+
+  const handleDeleteReview = async (reviewId, userName) => {
+    const confirmDelete = window.confirm(
+      `⚠️ DELETE REVIEW?\n\n` +
+      `User: ${userName}\n\n` +
+      `This will permanently delete this review.\n` +
+      `Are you sure?`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      console.log('🗑️ [MobileAdminDashboard] Deleting review:', reviewId);
+      
+      const response = await reviewService.deleteReview(reviewId);
+      
+      if (response.success) {
+        await loadReviews(); // Refresh reviews
+        alert('Review deleted successfully!');
+        console.log('✅ [MobileAdminDashboard] Review deleted');
+      } else {
+        alert('Failed to delete review: ' + response.message);
+      }
+    } catch (error) {
+      console.error('❌ [MobileAdminDashboard] Error deleting review:', error);
+      alert('Error deleting review. Please try again.');
+    }
+  };
+
   const handleDeleteUser = async (userId, userName, userEmail) => {
     const confirmDelete = window.confirm(
       `⚠️ DELETE USER PERMANENTLY?\n\n` +
@@ -402,6 +495,9 @@ const MobileAdminDashboard = () => {
     supportRequests: supportRequests.length,
     openSupport: supportRequests.filter(s => s.status === 'Open').length,
     galleryImages: images.length,
+    totalReviews: reviews.length,
+    approvedReviews: reviews.filter(r => r.status === 'approved').length,
+    pendingReviews: reviews.filter(r => r.status === 'pending').length,
   };
 
   const menuItems = [
@@ -491,6 +587,16 @@ const MobileAdminDashboard = () => {
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <div className="text-2xl font-bold text-indigo-600">{stats.galleryImages}</div>
                 <div className="text-sm text-gray-600">Gallery Images</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div className="bg-white rounded-lg shadow p-4 text-center">
+                <div className="text-2xl font-bold text-amber-600">{stats.totalReviews}</div>
+                <div className="text-sm text-gray-600">Total Reviews</div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-4 text-center">
+                <div className="text-2xl font-bold text-emerald-600">{stats.approvedReviews}</div>
+                <div className="text-sm text-gray-600">Approved Reviews</div>
               </div>
             </div>
           </div>
@@ -657,53 +763,86 @@ const MobileAdminDashboard = () => {
         {/* Reviews Tab */}
         {activeTab === 'reviews' && (
           <div className="space-y-4">
-            <h2 className="text-xl font-bold text-gray-800">User Reviews</h2>
-            {bookings.filter(b => b.userReview && b.userRating).map((booking) => (
-              <div key={booking.id} className="bg-white rounded-lg shadow p-4">
+            <div className="flex justify-between items-center">
+              <h2 className="text-xl font-bold text-gray-800">User Reviews</h2>
+              <button
+                onClick={loadReviews}
+                className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm hover:bg-red-700"
+              >
+                🔄 Refresh
+              </button>
+            </div>
+            
+            {Array.isArray(reviews) && reviews.length > 0 ? reviews.map((review) => (
+              <div key={review._id} className="bg-white rounded-lg shadow p-4">
                 <div className="flex justify-between items-start mb-3">
                   <div>
-                    <h3 className="font-semibold text-gray-900">{booking.name}</h3>
-                    <p className="text-sm text-gray-600">{booking.service}</p>
+                    <h3 className="font-semibold text-gray-900">{review.username}</h3>
+                    <p className="text-sm text-gray-600">{review.category}</p>
+                    <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${
+                      review.status === 'approved' 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-yellow-100 text-yellow-800'
+                    }`}>
+                      {review.status === 'approved' ? 'Approved' : 'Pending'}
+                    </span>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-yellow-500">
                       {[...Array(5)].map((_, i) => (
-                        <span key={i}>{i < booking.userRating ? '⭐' : '☆'}</span>
+                        <span key={i}>{i < review.rating ? '⭐' : '☆'}</span>
                       ))}
                     </span>
-                    <span className="text-sm text-gray-600">({booking.userRating}/5)</span>
+                    <span className="text-sm text-gray-600">({review.rating}/5)</span>
                   </div>
                 </div>
                 
-                <p className="text-sm text-gray-700 italic mb-2">"{booking.userReview}"</p>
-                <p className="text-xs text-gray-500 mb-3">Reviewed on {booking.reviewDate}</p>
+                <p className="text-sm text-gray-700 italic mb-2">"{review.review}"</p>
+                <p className="text-xs text-gray-500 mb-3">
+                  Reviewed on {new Date(review.createdAt).toLocaleDateString()}
+                </p>
 
-                {booking.adminReply && (
+                {review.adminReply && (
                   <div className="bg-gray-50 rounded-lg p-3 mb-3">
                     <p className="text-xs text-gray-500 mb-1">Admin reply:</p>
-                    <p className="text-sm text-gray-700">{booking.adminReply}</p>
-                    <p className="text-xs text-gray-400 mt-1">{booking.adminReplyDate}</p>
+                    <p className="text-sm text-gray-700">{review.adminReply}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {new Date(review.adminReplyDate).toLocaleDateString()}
+                    </p>
                   </div>
                 )}
 
-                <button
-                  onClick={() => {
-                    const reply = prompt('Reply to this review:', booking.adminReply || '');
-                    if (reply !== null) {
-                      const updatedBookings = bookings.map(b => 
-                        b.id === booking.id ? { ...b, adminReply: reply, adminReplyDate: new Date().toLocaleDateString() } : b
-                      );
-                      localStorage.setItem('bookings', JSON.stringify(updatedBookings));
-                      loadBookings();
-                      alert('Reply saved.');
-                    }
-                  }}
-                  className="text-blue-600 text-sm font-medium"
-                >
-                  {booking.adminReply ? 'Edit Reply' : 'Reply'}
-                </button>
+                <div className="flex gap-2 mt-3">
+                  <button
+                    onClick={() => handleReplyToReview(review._id, review.adminReply)}
+                    className="flex-1 py-2 px-3 bg-blue-600 text-white rounded-lg text-sm"
+                  >
+                    {review.adminReply ? 'Edit Reply' : 'Reply'}
+                  </button>
+                  <button
+                    onClick={() => handleToggleReviewApproval(review._id, review.status)}
+                    className={`flex-1 py-2 px-3 rounded-lg text-sm ${
+                      review.status === 'approved' 
+                        ? 'bg-yellow-100 text-yellow-800' 
+                        : 'bg-green-100 text-green-800'
+                    }`}
+                  >
+                    {review.status === 'approved' ? 'Mark Pending' : 'Approve'}
+                  </button>
+                  <button
+                    onClick={() => handleDeleteReview(review._id, review.username)}
+                    className="py-2 px-3 bg-red-600 text-white rounded-lg text-sm"
+                  >
+                    🗑️
+                  </button>
+                </div>
               </div>
-            ))}
+            )) : (
+              <div className="text-center py-8">
+                <div className="text-gray-400 text-4xl mb-4">⭐</div>
+                <p className="text-gray-500">No reviews yet</p>
+              </div>
+            )}
           </div>
         )}
 
