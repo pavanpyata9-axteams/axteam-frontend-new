@@ -47,14 +47,9 @@ const MobileAdminDashboard = () => {
       
       console.log('🖼️ [MobileAdminDashboard] Gallery response:', response.data);
       
-      if (response.data.success && response.data.data && response.data.data.gallery) {
-        const galleryData = Array.isArray(response.data.data.gallery) ? response.data.data.gallery : [];
-        setImages(galleryData);
-        console.log('✅ [MobileAdminDashboard] Loaded gallery images:', galleryData.length);
-      } else {
-        console.error('❌ [MobileAdminDashboard] Failed to load gallery:', response.data);
-        setImages([]);
-      }
+      const galleryItems = response.data.data;
+      setImages(galleryItems);
+      console.log('✅ [MobileAdminDashboard] Loaded gallery images:', galleryItems.length);
     } catch (error) {
       console.error('❌ [MobileAdminDashboard] Error loading gallery:', error);
       setImages([]);
@@ -101,13 +96,9 @@ const MobileAdminDashboard = () => {
       
       console.log('⭐ [MobileAdminDashboard] Reviews response:', response);
       
-      if (response.success && response.data && response.data.reviews) {
-        setReviews(response.data.reviews);
-        console.log('✅ [MobileAdminDashboard] Loaded reviews:', response.data.reviews.length);
-      } else {
-        console.error('❌ [MobileAdminDashboard] Failed to load reviews:', response);
-        setReviews([]);
-      }
+      const reviewItems = response.data.data;
+      setReviews(reviewItems);
+      console.log('✅ [MobileAdminDashboard] Loaded reviews:', reviewItems.length);
     } catch (error) {
       console.error('❌ [MobileAdminDashboard] Error loading reviews:', error);
       setReviews([]);
