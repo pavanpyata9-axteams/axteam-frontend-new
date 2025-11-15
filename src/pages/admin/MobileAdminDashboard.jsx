@@ -94,14 +94,9 @@ const MobileAdminDashboard = () => {
       
       const response = await reviewService.getAllReviews();
       
-      console.log('⭐ [MobileAdminDashboard] Reviews response:', response);
+      console.log('⭐ [MobileAdminDashboard] Reviews response:', response.data);
       
-      if (!response.data.data) {
-        console.error("Invalid review response:", response.data);
-        return;
-      }
-
-      const reviews = response.data.data;
+      const reviews = Array.isArray(response.data) ? response.data : [];
       setReviews(reviews);
       console.log('✅ [MobileAdminDashboard] Loaded reviews:', reviews.length);
     } catch (error) {
