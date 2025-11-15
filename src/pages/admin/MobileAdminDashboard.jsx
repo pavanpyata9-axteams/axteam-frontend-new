@@ -47,8 +47,8 @@ const MobileAdminDashboard = () => {
       
       console.log('🖼️ [MobileAdminDashboard] Gallery response:', response.data);
       
-      if (response.data.success && response.data.data) {
-        const galleryData = Array.isArray(response.data.data) ? response.data.data : [];
+      if (response.data.success && response.data.data && response.data.data.gallery) {
+        const galleryData = Array.isArray(response.data.data.gallery) ? response.data.data.gallery : [];
         setImages(galleryData);
         console.log('✅ [MobileAdminDashboard] Loaded gallery images:', galleryData.length);
       } else {
@@ -398,6 +398,25 @@ const MobileAdminDashboard = () => {
     }
   };
 
+  const handleToggleReviewVisibility = async (reviewId, currentVisibility) => {
+    try {
+      console.log('👁️ [MobileAdminDashboard] Toggling review visibility:', reviewId);
+      
+      const response = await reviewService.toggleReviewVisibility(reviewId);
+      
+      if (response.success) {
+        await loadReviews(); // Refresh reviews
+        alert(`Review ${currentVisibility ? 'hidden from' : 'shown on'} homepage!`);
+        console.log('✅ [MobileAdminDashboard] Review visibility toggled');
+      } else {
+        alert('Failed to toggle visibility: ' + response.message);
+      }
+    } catch (error) {
+      console.error('❌ [MobileAdminDashboard] Error toggling visibility:', error);
+      alert('Error toggling visibility. Please try again.');
+    }
+  };
+
   const handleDeleteReview = async (reviewId, userName) => {
     const confirmDelete = window.confirm(
       `⚠️ DELETE REVIEW?\n\n` +
@@ -498,6 +517,7 @@ const MobileAdminDashboard = () => {
     totalReviews: reviews.length,
     approvedReviews: reviews.filter(r => r.status === 'approved').length,
     pendingReviews: reviews.filter(r => r.status === 'pending').length,
+    visibleReviews: reviews.filter(r => r.isVisible).length,
   };
 
   const menuItems = [
@@ -597,6 +617,16 @@ const MobileAdminDashboard = () => {
               <div className="bg-white rounded-lg shadow p-4 text-center">
                 <div className="text-2xl font-bold text-emerald-600">{stats.approvedReviews}</div>
                 <div className="text-sm text-gray-600">Approved Reviews</div>
+              </div>
+            </div>
+            <div className="grid grid-cols-2 gap-3 mt-3">
+              <div className="bg-white rounded-lg shadow p-4 text-center">
+                <div className="text-2xl font-bold text-orange-600">{stats.pendingReviews}</div>
+                <div className="text-sm text-gray-600">Pending Reviews</div>
+              </div>
+              <div className="bg-white rounded-lg shadow p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600">{stats.visibleReviews}</div>
+                <div className="text-sm text-gray-600">Visible on Homepage</div>
               </div>
             </div>
           </div>
@@ -779,13 +809,22 @@ const MobileAdminDashboard = () => {
                   <div>
                     <h3 className="font-semibold text-gray-900">{review.username}</h3>
                     <p className="text-sm text-gray-600">{review.category}</p>
-                    <span className={`inline-block mt-1 px-2 py-1 text-xs rounded-full ${
-                      review.status === 'approved' 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-yellow-100 text-yellow-800'
-                    }`}>
-                      {review.status === 'approved' ? 'Approved' : 'Pending'}
-                    </span>
+                    <div className="flex gap-2 mt-1">
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        review.status === 'approved' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {review.status === 'approved' ? 'Approved' : 'Pending'}
+                      </span>
+                      <span className={`px-2 py-1 text-xs rounded-full ${
+                        review.isVisible 
+                          ? 'bg-blue-100 text-blue-800' 
+                          : 'bg-gray-100 text-gray-800'
+                      }`}>
+                        {review.isVisible ? 'Visible' : 'Hidden'}
+                      </span>
+                    </div>
                   </div>
                   <div className="flex items-center gap-1">
                     <span className="text-yellow-500">
@@ -812,16 +851,16 @@ const MobileAdminDashboard = () => {
                   </div>
                 )}
 
-                <div className="flex gap-2 mt-3">
+                <div className="grid grid-cols-2 gap-2 mt-3">
                   <button
                     onClick={() => handleReplyToReview(review._id, review.adminReply)}
-                    className="flex-1 py-2 px-3 bg-blue-600 text-white rounded-lg text-sm"
+                    className="py-2 px-3 bg-blue-600 text-white rounded-lg text-sm"
                   >
                     {review.adminReply ? 'Edit Reply' : 'Reply'}
                   </button>
                   <button
                     onClick={() => handleToggleReviewApproval(review._id, review.status)}
-                    className={`flex-1 py-2 px-3 rounded-lg text-sm ${
+                    className={`py-2 px-3 rounded-lg text-sm ${
                       review.status === 'approved' 
                         ? 'bg-yellow-100 text-yellow-800' 
                         : 'bg-green-100 text-green-800'
@@ -830,10 +869,20 @@ const MobileAdminDashboard = () => {
                     {review.status === 'approved' ? 'Mark Pending' : 'Approve'}
                   </button>
                   <button
+                    onClick={() => handleToggleReviewVisibility(review._id, review.isVisible)}
+                    className={`py-2 px-3 rounded-lg text-sm ${
+                      review.isVisible 
+                        ? 'bg-gray-100 text-gray-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}
+                  >
+                    {review.isVisible ? 'Hide from Homepage' : 'Show on Homepage'}
+                  </button>
+                  <button
                     onClick={() => handleDeleteReview(review._id, review.username)}
                     className="py-2 px-3 bg-red-600 text-white rounded-lg text-sm"
                   >
-                    🗑️
+                    🗑️ Delete
                   </button>
                 </div>
               </div>
