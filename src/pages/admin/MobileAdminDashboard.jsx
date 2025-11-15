@@ -40,12 +40,21 @@ const MobileAdminDashboard = () => {
 
   const loadImages = async () => {
     try {
-      const response = await api.get('/gallery');
-      if (response.data.success) {
-        setImages(response.data.data);
+      console.log('🔍 [MobileAdminDashboard] Loading gallery from backend...');
+      const response = await api.get('/api/gallery');
+      
+      console.log('🖼️ [MobileAdminDashboard] Gallery response:', response.data);
+      
+      if (response.data.success && response.data.data) {
+        const galleryData = Array.isArray(response.data.data) ? response.data.data : [];
+        setImages(galleryData);
+        console.log('✅ [MobileAdminDashboard] Loaded gallery images:', galleryData.length);
+      } else {
+        console.error('❌ [MobileAdminDashboard] Failed to load gallery:', response.data);
+        setImages([]);
       }
     } catch (error) {
-      console.error('Failed to load images:', error);
+      console.error('❌ [MobileAdminDashboard] Error loading gallery:', error);
       setImages([]);
     }
   };
@@ -84,11 +93,30 @@ const MobileAdminDashboard = () => {
 
   const loadUsers = async () => {
     try {
+      const axteamAuth = JSON.parse(localStorage.getItem('axteamAuth') || '{}');
+      const token = axteamAuth.token;
+      
+      if (!token) {
+        console.error('❌ [MobileAdminDashboard] No auth token for users');
+        return;
+      }
+
+      console.log('🔍 [MobileAdminDashboard] Loading all users from backend...');
+      
       const response = await api.get('/admin/users');
-      const users = response.data.data;
-      setUsers(users);
+
+      const data = response.data;
+      console.log('👥 [MobileAdminDashboard] Users response:', data);
+      
+      if (data.success && data.data && data.data.users) {
+        setUsers(data.data.users);
+        console.log('✅ [MobileAdminDashboard] Loaded users:', data.data.users.length);
+      } else {
+        console.error('❌ [MobileAdminDashboard] Failed to load users:', data);
+        setUsers([]);
+      }
     } catch (error) {
-      console.error('Failed to load users:', error);
+      console.error('❌ [MobileAdminDashboard] Error loading users:', error);
       setUsers([]);
     }
   };
@@ -120,7 +148,7 @@ const MobileAdminDashboard = () => {
         formData.append('category', newImage.category);
         formData.append('section', newImage.section);
 
-        const response = await api.post("/gallery/upload", formData, {
+        const response = await api.post("/api/gallery/upload", formData, {
           headers: { "Content-Type": "multipart/form-data" },
         });
 
@@ -139,11 +167,23 @@ const MobileAdminDashboard = () => {
     }
   };
 
-  const handleDeleteImage = (id) => {
+  const handleDeleteImage = async (id) => {
     if (window.confirm('Delete this image?')) {
-      const updatedImages = images.filter(img => img.id !== id);
-      localStorage.setItem('galleryImages', JSON.stringify(updatedImages));
-      loadImages();
+      try {
+        console.log('🗑️ [MobileAdminDashboard] Deleting image:', id);
+        const response = await api.delete(`/api/gallery/${id}`);
+        
+        if (response.data.success) {
+          console.log('✅ [MobileAdminDashboard] Image deleted successfully');
+          await loadImages(); // Refresh gallery
+          alert('Image deleted successfully!');
+        } else {
+          alert('Failed to delete image: ' + response.data.message);
+        }
+      } catch (error) {
+        console.error('❌ [MobileAdminDashboard] Error deleting image:', error);
+        alert('Error deleting image. Please try again.');
+      }
     }
   };
 
@@ -293,12 +333,52 @@ const MobileAdminDashboard = () => {
     loadSupportRequests();
   };
 
-  const handleDeleteUser = (email) => {
-    if (window.confirm(`Delete user ${email}?`)) {
-      const updatedUsers = users.filter(u => u.email !== email);
-      localStorage.setItem('users', JSON.stringify(updatedUsers));
-      loadUsers();
-      alert('User deleted!');
+  const handleDeleteUser = async (userId, userName, userEmail) => {
+    const confirmDelete = window.confirm(
+      `⚠️ DELETE USER PERMANENTLY?\n\n` +
+      `User: ${userName}\n` +
+      `Email: ${userEmail}\n\n` +
+      `This will:\n` +
+      `• Delete the user account from database\n` +
+      `• Delete ALL their bookings\n` +
+      `• User will NOT be able to login again\n\n` +
+      `Are you absolutely sure?`
+    );
+    
+    if (!confirmDelete) return;
+    
+    try {
+      const axteamAuth = JSON.parse(localStorage.getItem('axteamAuth') || '{}');
+      const token = axteamAuth.token;
+      
+      if (!token) {
+        alert('Authentication required. Please login again.');
+        return;
+      }
+      
+      console.log('🗑️ [MobileAdminDashboard] Deleting user:', userId);
+      
+      const response = await api.delete(`/admin/users/${userId}`);
+      
+      const data = response.data;
+      
+      if (data.success) {
+        alert(`✅ User Deleted Successfully!\n\n` +
+              `• User: ${data.data.deletedUser}\n` +
+              `• Deleted ${data.data.deletedBookings} booking(s)\n` +
+              `• User can no longer login`);
+        
+        // Refresh users list
+        await loadUsers();
+        await loadBookings(); // Also refresh bookings if needed
+        
+        console.log('✅ [MobileAdminDashboard] User deleted and data refreshed');
+      } else {
+        alert(`❌ Failed to delete user: ${data.message}`);
+      }
+    } catch (error) {
+      console.error('❌ [MobileAdminDashboard] Error deleting user:', error);
+      alert('❌ Error deleting user. Please try again.');
     }
   };
 
@@ -832,17 +912,17 @@ const MobileAdminDashboard = () => {
             )}
 
             <div className="grid grid-cols-2 gap-3">
-              {Array.isArray(images) ? images.map((image) => (
-                <div key={image.id} className="bg-white rounded-lg shadow overflow-hidden">
+              {Array.isArray(images) && images.length > 0 ? images.map((image) => (
+                <div key={image._id || image.id} className="bg-white rounded-lg shadow overflow-hidden">
                   {image.mediaType === 'video' ? (
                     <video 
-                      src={image.mediaData || image.url} 
+                      src={image.filePath || image.mediaData || image.url} 
                       className="w-full h-32 object-cover" 
                       controls
                     />
                   ) : (
                     <img 
-                      src={image.mediaData || image.imageData || image.url} 
+                      src={image.filePath || image.mediaData || image.imageData || image.url} 
                       alt={image.title} 
                       className="w-full h-32 object-cover" 
                     />
@@ -850,15 +930,21 @@ const MobileAdminDashboard = () => {
                   <div className="p-3">
                     <h3 className="font-semibold text-sm text-gray-800 truncate">{image.title}</h3>
                     <p className="text-xs text-gray-600 mt-1">{image.category}</p>
+                    <p className="text-xs text-gray-500">{image.section}</p>
                     <button
-                      onClick={() => handleDeleteImage(image.id)}
+                      onClick={() => handleDeleteImage(image._id || image.id)}
                       className="mt-2 w-full py-1 px-2 bg-red-600 text-white rounded text-xs"
                     >
                       Delete
                     </button>
                   </div>
                 </div>
-              )) : []}
+              )) : (
+                <div className="col-span-2 text-center py-8">
+                  <div className="text-gray-400 text-4xl mb-4">🖼️</div>
+                  <p className="text-gray-500">No gallery images yet</p>
+                </div>
+              )}
             </div>
           </div>
         )}
@@ -878,7 +964,7 @@ const MobileAdminDashboard = () => {
                     </span>
                   </div>
                   <button
-                    onClick={() => handleDeleteUser(user.email)}
+                    onClick={() => handleDeleteUser(user._id, user.name, user.email)}
                     className="px-3 py-2 bg-red-600 text-white rounded-lg text-sm"
                   >
                     Delete
